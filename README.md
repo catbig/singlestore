@@ -8,41 +8,55 @@ Please visit [SingleStore DB Helm Chart for K8s](https://docs.singlestore.com).
 
 ## A. Deployment with existing storage class
 We use "memsql" as namespace (You can change it)
+
 1. Deploy the CRD and namespace creation
-a. deployment
-$ helm install singlestore singlestore -nmemsql --create-namespace
-b. verify
-$ helm ls -nmemsql
+    1. Deployment
+```
+helm install singlestore singlestore -nmemsql --create-namespace
+```
+    2. Verify
+```
+helm ls -nmemsql
+```
 
 2. Deploy the operator & cluster
-$ helm upgrade singlestore singlestore --set memsqlCluster.install=true --reuse-values -nmemsql
-
+```
+helm upgrade singlestore singlestore --set memsqlCluster.install=true --reuse-values -nmemsql
+```
 ## B. Deployment with new local-storage class for non production environment only
 1. Deploy the CRD, storage class and namespace creation
 a. deployment
-$ helm install singlestore singlestore -nmemsql --set hostPV.install=true --create-namespace
+```
+helm install singlestore singlestore -nmemsql --set hostPV.install=true --create-namespace
+```
 b. verify
-$ helm ls -nmemsql
-
+```
+helm ls -nmemsql
+```
 2. Provision local-storage manually
 a. create folder in all k8s nodes
-$ sudo mkdir -p /mnt/disk/vol{1,2,3,4,5,6,7,8,9}
-$ sudo chown -R 1000:1000 /mnt/disk
-
+```
+sudo mkdir -p /mnt/disk/vol{1,2,3,4,5,6,7,8,9}
+sudo chown -R 1000:1000 /mnt/disk
+```
 b. create PV
-$ helm upgrade singlestore singlestore --reuse-values -nmemsql
-
+```
+helm upgrade singlestore singlestore --reuse-values -nmemsql
+```
 3. Deploy the operator & cluster
 a. deploy with local storage
-$ helm upgrade singlestore singlestore --set memsqlCluster.install=true --reuse-values -nmemsql
-
+```
+helm upgrade singlestore singlestore --set memsqlCluster.install=true --reuse-values -nmemsql
+```
 # To deploy MemSQL Studio
-$ helm upgrade singlestore singlestore --set memsqlCluster.install=true --reuse-values -nmemsql
-
+```
+helm upgrade singlestore singlestore --set memsqlCluster.install=true --reuse-values -nmemsql
+```
 # To scaling up/down, example
-$ helm upgrade singlestore singlestore --set memsqlCluster.leafSpec.count=3 --reuse-values -nmemsql
-$ helm upgrade singlestore singlestore --set memsqlCluster.aggregatorSpec.count=3 --reuse-values -nmemsql
-
+```
+helm upgrade singlestore singlestore --set memsqlCluster.leafSpec.count=3 --reuse-values -nmemsql
+helm upgrade singlestore singlestore --set memsqlCluster.aggregatorSpec.count=3 --reuse-values -nmemsql
+```
 ## Sample values-override.yaml file
 Below is a sample values-override.yaml file that shows how to override 
 configurable parameters of this Helm Chart.
