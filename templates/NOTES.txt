@@ -1,0 +1,68 @@
+{{- if .Release.IsInstall -}}
+{{- if or .Values.storage.nfs .Values.storage.local }}
+Continue install the PV with the below command:
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --reuse-values -nmemsql
+{{- else}}
+Operator installation with the below command:
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlOperator.install=true --reuse-values -nmemsql
+
+Cluster installation with the below command:
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true --reuse-values -nmemsql
+
+Add "--set memsqlStudio.install=true" if you want to install MemSQL Studio
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true\
+  --set memsqlStudio.install=true --reuse-values -nmemsql
+
+{{- end}}
+
+To learn more about the release, try:
+$ helm status {{ .Release.Name }} -n{{ .Release.Namespace }}
+{{- else -}}
+{{- if and (not .Values.memsqlCluster.install) (not .Release.IsInstall) }}
+Operator installation with the below command:
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlOperator.install=true --reuse-values -nmemsql
+
+Cluster installation with the below command:
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true --reuse-values -nmemsql
+
+Add "--set memsqlStudio.install=true" if you want to install MemSQL Studio
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true\
+  --set memsqlStudio.install=true --reuse-values -nmemsql
+
+To learn more about the release, try:
+  $ helm status {{ .Release.Name }} -n{{ .Release.Namespace }}
+{{- end }}
+{{- end -}}
+
+{{- if and .Values.memsqlCluster.install (not .Release.IsInstall) -}}
+
+-------------------------------------------
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}. 
+
+To learn more about the release, try:
+  $ helm status {{ .Release.Name }} -n{{ .Release.Namespace }}
+  $ helm get all {{ .Release.Name }} -n{{ .Release.Namespace }}
+
+To check the deployment status, run:
+  $ kubectl get memsqlcluster {{ .Values.memsqlCluster.name }} -o=jsonpath='{.status.phase}{"\n"}' -n{{ .Release.Namespace }}
+When the above command's output value is "Running", it means the SingleStore DB server deployment is finished
+
+Run:
+  $ kubectl get svc -n{{ .Release.Namespace }}| grep {{ .Values.memsqlCluster.name }}
+It will show two services:
+  svc-{{ .Values.memsqlCluster.name }}-ddl
+  svc-{{ .Values.memsqlCluster.name }}-dml
+Use MySQL compatible client to connect to the two service end points.
+
+To scaling up/down, try:
+  $ helm upgrade singlestore singlestore --set memsqlCluster.leafSpec.count=3 --reuse-values -n{{ .Release.Namespace }}
+  $ helm upgrade singlestore singlestore --set memsqlCluster.aggregatorSpec.count=3 --reuse-values -n{{ .Release.Namespace }}
+
+To learn more about deployment configurations, please run:
+  $ helm show readme {{ .Chart.Name }} --repo https://helm.singlestore.com/singlestore [--version 1.0.0]
+
+To uninstall, run:
+  $ helm uninstall {{ .Release.Name }} -n{{ .Release.Namespace }}
+{{- end -}}

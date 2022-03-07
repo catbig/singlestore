@@ -1,0 +1,61 @@
+{{- if and .Values.memsqlCluster.install (not .Release.IsInstall) -}}
+apiVersion: memsql.com/v1alpha1
+kind: MemsqlCluster
+metadata:
+  name: {{ .Values.memsqlCluster.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  license: {{ .Values.memsqlCluster.license }}
+  adminHashedPassword: "{{ .Values.memsqlCluster.adminHashedPassword }}"
+
+  nodeImage:
+    repository: {{ .Values.image.nodeImage }}
+    tag: {{ .Values.image.nodeImageTag }}
+
+  redundancyLevel: {{ .Values.memsqlCluster.redundancyLevel -}}
+
+{{- $nodeSpecLabels := dict "app" "memsql" }}
+{{- $nodeSpecMetaOverrides := dict "labels" $nodeSpecLabels }}
+{{- $nodeSpecCommon := dict "objectMetaOverrides" $nodeSpecMetaOverrides }}
+                 
+{{- $nodeSpecCommonCopy := deepCopy $nodeSpecCommon }}
+{{- $mergedAggSpec := merge $nodeSpecCommonCopy .Values.memsqlCluster.aggregatorSpec }}
+  aggregatorSpec:
+    storageClass: {{ .Values.storage.className }}
+{{ toYaml $mergedAggSpec | indent 4 }}
+
+{{- $nodeSpecCommonCopy := deepCopy $nodeSpecCommon }}
+{{- $mergedLeafSpec := merge $nodeSpecCommonCopy .Values.memsqlCluster.leafSpec }}
+  leafSpec:
+    storageClass: {{ .Values.storage.className }}
+{{ toYaml $mergedLeafSpec | indent 4 }}
+
+  {{ if .Values.memsqlCluster.serviceSpec -}} serviceSpec:
+{{ toYaml .Values.memsqlCluster.serviceSpec | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.backupSpec -}} backupSpec:
+{{ toYaml .Values.memsqlCluster.backupSpec | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.objectOverrides -}} objectOverrides:
+{{ toYaml .Values.memsqlCluster.objectOverrides | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.schedulingDetails -}} schedulingDetails:
+{{ toYaml .Values.memsqlCluster.schedulingDetails | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.replicationSpec -}} replicationSpec:
+{{ toYaml .Values.memsqlCluster.replicationSpec | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.secureConnectionSpec -}} secureConnectionSpec:
+{{ toYaml .Values.memsqlCluster.secureConnectionSpec | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.monitoringSpec -}} monitoringSpec:
+{{ toYaml .Values.memsqlCluster.monitoringSpec | indent 4 }}
+  {{- end }}
+
+{{- end -}}

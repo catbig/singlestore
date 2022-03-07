@@ -1,0 +1,59 @@
+fsGroup: "998"
+storage:
+  className: baremetal-storage
+
+memsqlOperator:
+  # set true to install the operator
+  install: true
+  serviceAccountName: memsql-operator
+  name: memsql-operator
+  replicas: 1
+  ## arguments to deployment.yaml
+  coresPerUnit: "8"
+  memoryPerUnit: "16"
+  additionalArgs: []
+
+memsqlCluster:
+  # set true to install the cluster
+  install: true
+  # cluster name
+  name: memsql-cluster
+  # TODO: paste your license key from https://portal.singlestore.com here:
+  license: BGE5NDQ2MjIyYTA1MTQxMTg4MDgyYzE3NTU3MzJmOGQ3QPCsXgAAAAAAAAAAAAAAAAkwNQIZAPiFk8QSzxC0KTSg2U7mM0sKq81hdcM2tAIYaicyeYyi97ho/EPvvKkxrf8yy+rinBAUAA==
+  # select password("secret");
+  adminHashedPassword: "*14E65567ABDB5135D0CFD9A70B3032C179A49EE7"
+  # set > 1 to enable HA mode
+  redundancyLevel: 1
+
+  aggregatorSpec:
+    count: 2
+    height: 0.25
+    storageGB: 10
+
+  leafSpec:
+    count: 2
+    height: 0.25
+    storageGB: 20
+
+  #schedulingDetails:
+  #  master:
+  #    nodeSelector:
+  #      node-type: compute
+  #    tolerations:
+  #    - key: "node-type"
+  #      operator: "Exists"
+  #      effect: "NoSchedule"
+  #  aggregator:
+  #    nodeSelector:
+  #      node-type: compute
+  #    tolerations:
+  #    - key: "node-type"
+  #      operator: "Exists"
+  #      effect: "NoSchedule"
+  #  leaf-ag1:
+  #    nodeSelector:
+  #      mama: ok
+  #    tolerations:
+  #    - key: "mama"
+  #      operator: "Exists"
+  #      effect: "NoSchedule"

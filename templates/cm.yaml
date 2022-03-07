@@ -1,0 +1,75 @@
+{{- if and .Values.memsqlCluster.install (not .Release.IsInstall) -}}
+apiVersion: v1
+data:
+  exporter-startup-script: "#!/usr/bin/env bash\nset -e\n\nsource /assets/lib.sh\n\nif
+    [ -n \"${RELEASE_ID}\" ]; then\n\tlog \"RELEASE_ID is defined, install MemSQL\"\n\tonce
+    /opt/.install-lock installRelease \"${RELEASE_ID}\"\nfi\n\nif ! [ -x \"/bin/memsql_exporter\"
+    ]; then\n\tlog \"/bin/memsql_exporter is set to a non-executable file\"\n\texit
+    1\nfi\n\n# Start MemSQL Exporter\n/bin/memsql_exporter\n"
+  liveness-probe: "#!/usr/bin/env bash\nset -euo pipefail\nif command -v -- memsqlctl
+    >/dev/null; then\n\tPROCESSSTATE=$(memsqlctl describe-node --property processState)\n\tif
+    [[ ${PROCESSSTATE} != \"Running\" ]]; then\n\t\texit 1\n\tfi\nfi\n"
+  readiness-probe: "#!/usr/bin/env python\nimport subprocess\nimport json\nimport
+    os\ndef run(*args):\n\treturn subprocess.check_output(args)\nrun(\"memsqlctl\",
+    \"query\", \"--sql\", \"SELECT 1\")\n# Build query to get node state\nquery
+    = \"SELECT NODE_ID FROM information_schema.lmv_nodes\"\nnode = json.loads(run(\"memsqlctl\",
+    \"query\", \"-j\", \"--sql\", query))\nnode_id = node[\"rows\"][0][\"NODE_ID\"]\n\nquery
+    = \"SELECT * FROM information_schema.aggregators WHERE NODE_ID = '%s'\" % node_id\n\n#
+    Check the node state\nnodes = json.loads(run(\"memsqlctl\", \"query\", \"-j\",
+    \"--sql\", query))\n# Node should be added to cluster, and online\nif \"rows\"
+    not in nodes or len(nodes[\"rows\"]) == 0:\n\traise Exception(\"node not found
+    in the cluster\")\nif nodes[\"rows\"][0][\"STATE\"] != \"online\":\n\traise
+    Exception(\"not ready: node is expected to be online, actual %s\" % nodes[\"rows\"][0][\"STATE\"])\n\n#
+    Check database states\ndbs = json.loads(run(\"memsqlctl\", \"query\", \"-j\",
+    \"--sql\", \"SHOW DATABASES EXTENDED\"))\nfor db in dbs[\"rows\"]:\n\tif db[\"State\"]
+    not in [\"online\", \"replicating\"]:\n\t\traise Exception(\"not ready: database
+    %s has state %s\" % (db[\"Database\"], db[\"State\"]))\n"
+  update-config-script: "#!/usr/bin/env bash\nset -euo pipefail\nlog() { (>&2
+    echo \"${@}\") }\nversion=$(memsqlctl version | sed -n 's/^Version: \\(.*\\)$/\\1/p')\nmemsqlctl
+    -y update-config --key allow_unsupported_filesystem --value ON\nif [ ${version:0:1}
+    -eq '7' ]; then memsqlctl -y update-config --key unmanaged_cluster --value 1;
+    fi\ninstallDir=$(dirname $(readlink -f /usr/bin/memsqlctl))\nmemsqldPath=${installDir}/memsqld\nsyncVars=($(${memsqldPath}
+    --print-sync-vars))\nif [[ ! \" ${syncVars[@]} \" =~ \" minimal_disk_space \"
+    ]]; then\n\tmemsqlctl -y update-config --key minimal_disk_space --value '512'\nfi\n"
+kind: ConfigMap
+metadata:
+  name: new-scripts-aggregators
+  namespace: {{ $.Release.Namespace }}
+---
+apiVersion: v1
+data:
+  exporter-startup-script: "#!/usr/bin/env bash\nset -e\n\nsource /assets/lib.sh\n\nif
+    [ -n \"${RELEASE_ID}\" ]; then\n\tlog \"RELEASE_ID is defined, install MemSQL\"\n\tonce
+    /opt/.install-lock installRelease \"${RELEASE_ID}\"\nfi\n\nif ! [ -x \"/bin/memsql_exporter\"
+    ]; then\n\tlog \"/bin/memsql_exporter is set to a non-executable file\"\n\texit
+    1\nfi\n\n# Start MemSQL Exporter\n/bin/memsql_exporter\n"
+  liveness-probe: "#!/usr/bin/env bash\nset -euo pipefail\nif command -v -- memsqlctl
+    >/dev/null; then\n\tPROCESSSTATE=$(memsqlctl describe-node --property processState)\n\tif
+    [[ ${PROCESSSTATE} != \"Running\" ]]; then\n\t\texit 1\n\tfi\nfi\n"
+  readiness-probe: "#!/usr/bin/env python\nimport subprocess\nimport json\nimport
+    os\ndef run(*args):\n\treturn subprocess.check_output(args)\nrun(\"memsqlctl\",
+    \"query\", \"--sql\", \"SELECT 1\")\n# Build query to get node state\nquery
+    = \"SELECT NODE_ID FROM information_schema.lmv_nodes\"\nnode = json.loads(run(\"memsqlctl\",
+    \"query\", \"-j\", \"--sql\", query))\nnode_id = node[\"rows\"][0][\"NODE_ID\"]\n\nquery
+    = \"SELECT * FROM information_schema.leaves WHERE NODE_ID = '%s'\" % node_id\n\n#
+    Check the node state\nnodes = json.loads(run(\"memsqlctl\", \"query\", \"-j\",
+    \"--sql\", query))\n# Node should be added to cluster, and online\nif \"rows\"
+    not in nodes or len(nodes[\"rows\"]) == 0:\n\traise Exception(\"node not found
+    in the cluster\")\nif nodes[\"rows\"][0][\"STATE\"] != \"online\":\n\traise
+    Exception(\"not ready: node is expected to be online, actual %s\" % nodes[\"rows\"][0][\"STATE\"])\n\n#
+    Check database states\ndbs = json.loads(run(\"memsqlctl\", \"query\", \"-j\",
+    \"--sql\", \"SHOW DATABASES EXTENDED\"))\nfor db in dbs[\"rows\"]:\n\tif db[\"State\"]
+    not in [\"online\", \"replicating\"]:\n\t\traise Exception(\"not ready: database
+    %s has state %s\" % (db[\"Database\"], db[\"State\"]))\n"
+  update-config-script: "#!/usr/bin/env bash\nset -euo pipefail\nlog() { (>&2
+    echo \"${@}\") }\nversion=$(memsqlctl version | sed -n 's/^Version: \\(.*\\)$/\\1/p')\nmemsqlctl
+    -y update-config --key allow_unsupported_filesystem --value ON\nif [ ${version:0:1}
+    -eq '7' ]; then memsqlctl -y update-config --key unmanaged_cluster --value 1;
+    fi\ninstallDir=$(dirname $(readlink -f /usr/bin/memsqlctl))\nmemsqldPath=${installDir}/memsqld\nsyncVars=($(${memsqldPath}
+    --print-sync-vars))\nif [[ ! \" ${syncVars[@]} \" =~ \" minimal_disk_space \"
+    ]]; then\n\tmemsqlctl -y update-config --key minimal_disk_space --value '512'\nfi\n"
+kind: ConfigMap
+metadata:
+  name: new-scripts-leaves
+  namespace: {{ $.Release.Namespace }}
+{{- end -}}

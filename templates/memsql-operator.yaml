@@ -1,0 +1,58 @@
+{{- if and .Values.memsqlOperator.install (not .Release.IsInstall) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.memsqlOperator.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  replicas: {{ .Values.memsqlOperator.replicas }}
+  selector:
+    matchLabels:
+      name: {{ .Values.memsqlOperator.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.memsqlOperator.name }}
+    spec:
+      serviceAccountName: {{ .Values.memsqlOperator.serviceAccountName }}
+      containers:
+        - name: {{ .Values.memsqlOperator.name }}
+          image: {{ .Values.image.operatorImage }}
+          imagePullPolicy: Always
+          args:
+            {{ if .Values.memsqlOperator.additionalArgs }}
+            {{- range $a := .Values.memsqlOperator.additionalArgs -}}
+            - {{ $a | quote }}
+            {{ end }}
+            {{- end -}}
+            {{ if ne .Values.memsqlOperator.coresPerUnit "" -}}
+            - "--cores-per-unit"
+            - "{{ .Values.memsqlOperator.coresPerUnit }}"
+            {{- end }}
+            {{ if ne .Values.memsqlOperator.memoryPerUnit "" -}}
+            - "--memory-per-unit"
+            - "{{ .Values.memsqlOperator.memoryPerUnit }}"
+            {{- end }}
+            - "--merge-service-annotations"
+            - "--cluster-id"
+            - "{{ .Values.memsqlCluster.name }}"
+            {{ if .Values.fsGroup }}
+            - "--fs-group-id"
+            - "{{ .Values.fsGroup }}"
+            {{ end }}
+            {{ if .Values.memsqlOperator.masterExporterParameter }}
+            - "--master-exporter-parameters"
+            - "{{ .Values.memsqlOperator.masterExporterParameter }}"
+            {{ end }}
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: {{ .Values.memsqlOperator.name }}
+{{- end -}}

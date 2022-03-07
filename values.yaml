@@ -1,0 +1,106 @@
+## valid values for state: "enabled" or "disabled"
+state: "enabled"
+fsGroup: "5555"
+storage:
+  className: baremetal-storage
+  nfs: false
+  local: false
+
+image:
+  operatorImage: memsql/operator:1.2.5-83e8133a
+  nodeImage: memsql/node
+  ## nodeImageVersion should be consistent with engine version indicated by nodeImageTag
+  nodeImageVersion: &nodeImageVersion 7.3.12
+  nodeImageTag: centos-7.3.12-2d93725f98
+  memsqlStudioImage: memsql/cluster-in-a-box
+
+addon:
+  ## Leave id as is
+  id: "singlestore"
+  version: *nodeImageVersion
+
+memsqlOperator:
+  # set true to install the operator
+  install: false
+  serviceAccountName: memsql-operator
+  name: memsql-operator
+  replicas: 1
+  ## arguments to deployment.yaml
+  coresPerUnit: "8"
+  memoryPerUnit: "32"
+  master-exporter-parameters: ""
+  additionalArgs: []
+
+memsqlCluster:
+  # set true to install the cluster
+  install: false
+  # cluster name
+  name: memsql-cluster
+  # TODO: paste your license key from https://portal.singlestore.com here:
+  license: REPLACE_THIS_WITH_LICENSE
+  # select password("secret");
+  adminHashedPassword: "*14E65567ABDB5135D0CFD9A70B3032C179A49EE7"
+  # set > 1 to enable HA mode
+  redundancyLevel: 1
+
+  aggregatorSpec:
+    count: 2
+    height: 0.5
+    storageGB: 10
+
+  leafSpec:
+    count: 2
+    height: 0.5
+    storageGB: 20
+
+  # https://docs.singlestore.com/db/v7.3/en/reference/memsql-operator-reference/memsql-pod-scheduling.html
+  # STATEFULSET_TYPE is one of master, aggregator, leaf-ag1, or leaf-ag2
+  # kubectl get statefulset -n<namespace>
+  # schedulingDetails:
+  #   STATEFULSET_TYPE:
+  #     nodeName: custom_node_name
+  #     nodeSelector:
+  #       custom: label
+  #     tolerations:
+  #     - key: "custom_key"
+  #       operator: "Exists"
+  #       effect: "NoSchedule"
+  #     affinity:
+  #       podAntiAffinity:
+  #         preferredDuringSchedulingIgnoredDuringExecution:
+  #         - weight: 1
+  #           podAffinityTerm:
+  #             labelSelector:
+  #               matchLabels:
+  #                 custom: label
+  #             topologyKey: "kubernetes.io/hostname"
+  #       podAffinity: ...
+  #       nodeAffinity: ... 
+  #schedulingDetails:
+  #  node-memsql-cluster-master:
+  #    nodeSelector:
+  #      node-type: compute
+  #    tolerations:
+  #    - key: "node-type"
+  #      operator: "Exists"
+  #      effect: "NoSchedule"
+  #  leaf-ag1:
+  #    nodeSelector:
+  #      node-type: compute
+  #    tolerations:
+  #    - key: "node-type"
+  #      operator: "Exists"
+  #      effect: "NoSchedule"
+  #  leaf-ag1:
+  #    nodeSelector:
+  #      node-type: compute
+  #    tolerations:
+  #    - key: "node-type"
+  #      operator: "Exists"
+  #      effect: "NoSchedule"
+
+memsqlStudio:
+  # set true to install the studio
+  install: false
+  name: memsql-studio
+  replicas: 1

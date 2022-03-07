@@ -1,0 +1,44 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: memsqlclusters.memsql.com
+spec:
+  names:
+    kind: MemsqlCluster
+    listKind: MemsqlClusterList
+    plural: memsqlclusters
+    singular: memsqlcluster
+    shortNames:
+      - msc
+  group: memsql.com
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            x-kubernetes-preserve-unknown-fields: true
+          status:
+            x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Aggregators
+      type: integer
+      description: Number of MemSQL Aggregators
+      jsonPath: .spec.aggregatorSpec.count
+    - name: Leaves
+      type: integer
+      description: Number of MemSQL Leaves (per availability group)
+      jsonPath: .spec.leafSpec.count
+    - name: Redundancy Level
+      type: integer
+      description: Redundancy level of MemSQL Cluster
+      jsonPath: .spec.redundancyLevel
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+  scope: Namespaced

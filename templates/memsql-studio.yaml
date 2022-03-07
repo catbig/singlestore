@@ -1,0 +1,85 @@
+{{- if and .Values.memsqlStudio.install (not .Release.IsInstall) -}}
+# A Statefulset ensures pod(s) use persistent volume
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.memsqlStudio.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  replicas: {{ .Values.memsqlStudio.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.memsqlStudio.name }}
+  serviceName: svc-{{ .Values.memsqlStudio.name }}
+  template:
+    # Here's the definition of the pod:
+    metadata:
+      # The service finds all pods with matching metadata
+      labels:
+        app: {{ .Values.memsqlStudio.name }}
+    spec:
+      containers:
+      - name: memsql-studio
+        command:
+        - /bin/sh
+        - -c
+        - touch -a /var/lib/memsql-studio/studio.hcl;
+          memsql-studio --port 8081
+        resources:
+        # Cluster-in-a-box image is pulled from Docker Hub 
+        image: {{ .Values.image.memsqlStudioImage }}
+        ports:
+        - containerPort: 8081 # MemSQL Studio
+        env:
+        # 'N' means stop running the cluster after init. Since we need the studio only
+        - name: START_AFTER_INIT
+          value: 'N'
+        - name: LICENSE_KEY
+          value: {{ .Values.memsqlCluster.license }}
+        volumeMounts:
+        - mountPath: /var/lib/memsql-studio
+          name: pv-studio
+      securityContext:
+        fsGroup: {{ .Values.fsGroup | required "must provide fsGroup id. Use the starting value in current namespace's"}}
+        supplementalGroups:
+        - {{ .Values.fsGroup | required "must provide fsGroup id. Use the starting value in current namespace's"}}
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app.kubernetes.io/component: extention
+        app.kubernetes.io/instance: memsql-studio
+        app.kubernetes.io/name: memsql-studio
+      name: pv-studio
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: {{ .Values.storage.className }}
+      volumeMode: Filesystem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.memsqlStudio.name }}
+  name: svc-{{ .Values.memsqlStudio.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: LoadBalancer
+  selector:
+    app: memsql-studio
+  ports:
+  # MemSQL Studio port:
+  ports:
+  - port: 8081
+    protocol: TCP
+    targetPort: 8081
+{{- end -}}
