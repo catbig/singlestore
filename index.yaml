@@ -1,7 +1,7 @@
 apiVersion: v1
 entries:
   singlestore:
-    apiVersion: v1
+  - apiVersion: v1
     appVersion: v1.2.3
     description: SingleStore for Kubernetes.
     home: https://github.com/catbig/singlestore
