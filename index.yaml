@@ -2,33 +2,33 @@ apiVersion: v1
 entries:
   singlestore:
     - annotations:
-      catalog.cattle.io/auto-install: longhorn-crd=match
-      catalog.cattle.io/certified: rancher
-      catalog.cattle.io/display-name: SingleStore
-      catalog.cattle.io/kube-version: '>=1.18.0-0'
-      catalog.cattle.io/namespace: singlestore
-      catalog.cattle.io/os: linux
-      catalog.cattle.io/permits-os: linux,windows
-      catalog.cattle.io/provides-gvr: longhorn.io/v1beta1
-      catalog.cattle.io/rancher-version: '>= 2.6.0-0'
-      catalog.cattle.io/release-name: singlestore
-      catalog.cattle.io/type: cluster-tool
-      catalog.cattle.io/ui-component: singlestore
-      catalog.cattle.io/upstream-version: 1.2.3
-    apiVersion: v1
-    appVersion: v1.2.3
-    description: SingleStore for Kubernetes.
-    home: https://github.com/catbig/singlestore
-    keywords:
-    - singlestore
-    - database
-    kubeVersion: '>=1.18.0-0'
-    maintainers:
-    - email: catbig@gmail.com
-      name: SingleStore Chart
-    name: singlestore
-    sources:
-    - https://github.com/catbig/singlestore
-    urls:
-    - asset/singlestore-2.tgz
-    version: 2.0
+        catalog.cattle.io/auto-install: longhorn-crd=match
+        catalog.cattle.io/certified: rancher
+        catalog.cattle.io/display-name: SingleStore
+        catalog.cattle.io/kube-version: '>=1.18.0-0'
+        catalog.cattle.io/namespace: singlestore
+        catalog.cattle.io/os: linux
+        catalog.cattle.io/permits-os: linux,windows
+        catalog.cattle.io/provides-gvr: longhorn.io/v1beta1
+        catalog.cattle.io/rancher-version: '>= 2.6.0-0'
+        catalog.cattle.io/release-name: singlestore
+        catalog.cattle.io/type: cluster-tool
+        catalog.cattle.io/ui-component: singlestore
+        catalog.cattle.io/upstream-version: 1.2.3
+      apiVersion: v2
+      appVersion: v0.2
+      description: SingleStore for Kubernetes.
+      home: https://github.com/catbig/singlestore
+      keywords:
+      - singlestore
+      - database
+      kubeVersion: '>=1.18.0-0'
+      maintainers:
+      - email: catbig@gmail.com
+        name: SingleStore Chart
+      name: singlestore
+      sources:
+      - https://github.com/catbig/singlestore
+      urls:
+      - asset/singlestore-2.tgz
+      version: 2.0
