@@ -1,4 +1,3 @@
-{{- if and .Values.memsqlCluster.install (not .Release.IsInstall) -}}
 apiVersion: v1
 data:
   exporter-startup-script: "#!/usr/bin/env bash\nset -e\n\nsource /assets/lib.sh\n\nif
@@ -72,4 +71,3 @@ kind: ConfigMap
 metadata:
   name: new-scripts-leaves
   namespace: {{ $.Release.Namespace }}
-{{- end -}}

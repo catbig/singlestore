@@ -1,0 +1,13 @@
+apiVersion: v1.0
+description: SingleStore CRD
+home: https://singlestore.com
+icon: https://www.singlestore.com/images/pages/brand/card-logo/vertical-color.png
+keywords:
+- SingleStore CRD
+- database
+kubeVersion: ^1.11.0-0
+maintainers:
+- email: caturtkm@singlestore.com
+  name: SingleStore Devs
+name: singlestore-crd
+version: "0.1"

@@ -1,0 +1,14 @@
+apiVersion: v1.0
+description: SingleStore DB for K8s
+home: https://singlestore.com
+icon: https://www.singlestore.com/images/pages/brand/card-logo/vertical-color.png
+keywords:
+- SingleStore DB
+- database
+- operator
+kubeVersion: ^1.11.0-0
+maintainers:
+- email: caturtkm@singlestore.com
+  name: SingleStore Devs
+name: singlestore
+version: "0.1"

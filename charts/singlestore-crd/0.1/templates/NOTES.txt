@@ -1,0 +1,19 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}. 
+
+To learn more about the release, try:
+  $ helm status {{ .Release.Name }} -n{{ .Release.Namespace }}
+  $ helm get all {{ .Release.Name }} -n{{ .Release.Namespace }}
+
+Continue install the SingleStore DB with the below command:
+
+Operator installation with the below command:
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlOperator.install=true --reuse-values -nmemsql
+
+Cluster installation with the below command:
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true --reuse-values -nmemsql
+
+Add "--set memsqlStudio.install=true" if you want to install MemSQL Studio
+  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true\
+  --set memsqlStudio.install=true --reuse-values -nmemsql

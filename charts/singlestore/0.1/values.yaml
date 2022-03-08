@@ -2,7 +2,7 @@
 state: "enabled"
 fsGroup: "5555"
 storage:
-  className: baremetal-storage
+  className: longhorn
   nfs: false
   local: false
 
@@ -21,7 +21,7 @@ addon:
 
 memsqlOperator:
   # set true to install the operator
-  install: false
+  install: true
   serviceAccountName: memsql-operator
   name: memsql-operator
   replicas: 1
@@ -33,7 +33,7 @@ memsqlOperator:
 
 memsqlCluster:
   # set true to install the cluster
-  install: false
+  install: true
   # cluster name
   name: memsql-cluster
   # TODO: paste your license key from https://portal.singlestore.com here:
@@ -101,6 +101,6 @@ memsqlCluster:
 
 memsqlStudio:
   # set true to install the studio
-  install: false
+  install: true
   name: memsql-studio
   replicas: 1

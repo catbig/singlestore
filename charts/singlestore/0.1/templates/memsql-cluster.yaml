@@ -1,4 +1,3 @@
-{{- if and .Values.memsqlCluster.install (not .Release.IsInstall) -}}
 apiVersion: memsql.com/v1alpha1
 kind: MemsqlCluster
 metadata:
@@ -57,5 +56,3 @@ spec:
   {{ if .Values.memsqlCluster.monitoringSpec -}} monitoringSpec:
 {{ toYaml .Values.memsqlCluster.monitoringSpec | indent 4 }}
   {{- end }}
-
-{{- end -}}

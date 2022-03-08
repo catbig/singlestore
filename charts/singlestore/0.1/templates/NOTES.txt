@@ -1,4 +1,3 @@
-{{- if .Release.IsInstall -}}
 {{- if or .Values.storage.nfs .Values.storage.local }}
 Continue install the PV with the below command:
   $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --reuse-values -nmemsql
@@ -32,9 +31,6 @@ Add "--set memsqlStudio.install=true" if you want to install MemSQL Studio
 To learn more about the release, try:
   $ helm status {{ .Release.Name }} -n{{ .Release.Namespace }}
 {{- end }}
-{{- end -}}
-
-{{- if and .Values.memsqlCluster.install (not .Release.IsInstall) -}}
 
 -------------------------------------------
 Thank you for installing {{ .Chart.Name }}.
@@ -65,4 +61,3 @@ To learn more about deployment configurations, please run:
 
 To uninstall, run:
   $ helm uninstall {{ .Release.Name }} -n{{ .Release.Namespace }}
-{{- end -}}
