@@ -1,38 +1,3 @@
-{{- if or .Values.storage.nfs .Values.storage.local }}
-Continue install the PV with the below command:
-  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --reuse-values -nmemsql
-{{- else}}
-Operator installation with the below command:
-  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlOperator.install=true --reuse-values -nmemsql
-
-Cluster installation with the below command:
-  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true --reuse-values -nmemsql
-
-Add "--set memsqlStudio.install=true" if you want to install MemSQL Studio
-  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true\
-  --set memsqlStudio.install=true --reuse-values -nmemsql
-
-{{- end}}
-
-To learn more about the release, try:
-$ helm status {{ .Release.Name }} -n{{ .Release.Namespace }}
-{{- else -}}
-{{- if and (not .Values.memsqlCluster.install) (not .Release.IsInstall) }}
-Operator installation with the below command:
-  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlOperator.install=true --reuse-values -nmemsql
-
-Cluster installation with the below command:
-  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true --reuse-values -nmemsql
-
-Add "--set memsqlStudio.install=true" if you want to install MemSQL Studio
-  $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set memsqlCluster.install=true\
-  --set memsqlStudio.install=true --reuse-values -nmemsql
-
-To learn more about the release, try:
-  $ helm status {{ .Release.Name }} -n{{ .Release.Namespace }}
-{{- end }}
-
--------------------------------------------
 Thank you for installing {{ .Chart.Name }}.
 
 Your release is named {{ .Release.Name }}. 
