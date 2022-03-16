@@ -37,7 +37,7 @@ memsqlCluster:
   # cluster name
   name: memsql-cluster
   # TODO: paste your license key from https://portal.singlestore.com here:
-  license: BDYyNzIxZjRmOWFjNjQ4ZTg5ZTFiZDg1NjYwNGJhYWFlAAAAAAAAAAAEAAAAAAAAAAwwNAIYT2yCFh90RxCCi8QXPCY54aPkVzdngVUDAhg/8+7z96uad368VzSloSEzVe74KVKIEaAAAA==
+  license: REPLACE_WITH_YOUR_LICENSE
   # select password("secret");
   adminHashedPassword: "*14E65567ABDB5135D0CFD9A70B3032C179A49EE7"
   # set > 1 to enable HA mode
