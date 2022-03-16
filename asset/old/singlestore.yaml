@@ -1,0 +1,60 @@
+## valid values for state: "enabled" or "disabled"
+state: "enabled"
+fsGroup: "5555"
+storage:
+  className: gp2
+  nfs: false
+  local: false
+
+image:
+  operatorImage: memsql/operator:1.2.5-83e8133a
+  nodeImage: memsql/node
+  ## nodeImageVersion should be consistent with engine version indicated by nodeImageTag
+  nodeImageVersion: &nodeImageVersion 7.6.13
+  nodeImageTag: centos-7.6.13-39da2f5c72
+  memsqlStudioImage: memsql/cluster-in-a-box
+
+addon:
+  ## Leave id as is
+  id: "singlestore"
+  version: *nodeImageVersion
+
+memsqlOperator:
+  # set true to install the operator
+  install: true
+  serviceAccountName: memsql-operator
+  name: memsql-operator
+  replicas: 1
+  ## arguments to deployment.yaml
+  coresPerUnit: "8"
+  memoryPerUnit: "16"
+  master-exporter-parameters: ""
+  additionalArgs: []
+
+memsqlCluster:
+  # set true to install the cluster
+  install: true
+  # cluster name
+  name: memsql-cluster
+  # TODO: paste your license key from https://portal.singlestore.com here:
+  license: BDYyNzIxZjRmOWFjNjQ4ZTg5ZTFiZDg1NjYwNGJhYWFlAAAAAAAAAAAEAAAAAAAAAAwwNAIYT2yCFh90RxCCi8QXPCY54aPkVzdngVUDAhg/8+7z96uad368VzSloSEzVe74KVKIEaAAAA==
+  # select password("secret");
+  adminHashedPassword: "*14E65567ABDB5135D0CFD9A70B3032C179A49EE7"
+  # set > 1 to enable HA mode
+  redundancyLevel: 1
+
+  aggregatorSpec:
+    count: 2
+    height: 0.125
+    storageGB: 5
+
+  leafSpec:
+    count: 1
+    height: 0.125
+    storageGB: 5
+memsqlStudio:
+  # set true to install the studio
+  install: true
+  name: memsql-studio
+  replicas: 1
+
